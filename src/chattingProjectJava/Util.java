@@ -3,17 +3,30 @@ package chattingProjectJava;
 import java.util.Scanner;
 
 public class Util {
-
+	
+	
 	Scanner scanner = new Scanner(System.in);
+	
 //Singleton Object
 	private static Util util;
 
-//Get Object
+//Get Object\
 	public static Util getObject() {
 		if (util == null) {
 			util = new Util();
 		}
 		return util;
+	}
+	
+//Get Byte Value
+	public byte getByte() {
+		while(true) {
+			if(scanner.hasNextByte()) {
+				return scanner.nextByte();
+			}else {
+				scanner.nextLine();
+			}
+		}
 	}
 
 //Get Integer Value

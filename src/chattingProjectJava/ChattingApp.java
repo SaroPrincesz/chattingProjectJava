@@ -7,8 +7,8 @@ public class ChattingApp {
 
 	private static ChattingApp main;
 	static List<User> chattingAppUsers = new ArrayList<User>();
-	static Util server = Util.getObject();
-	static Contact contact = new Contact();
+	static Util server = Util.getUtilObject();
+	static Contact contact = Contact.getContactInstance();
 
 	public static ChattingApp getInstance() {
 		if (main == null) {
@@ -64,6 +64,8 @@ public class ChattingApp {
 	public User addUserDetails(User user) {
 		if (isExistPhoneNumber(user.getPhoneNumber()) == null) {
 			main.chattingAppUsers.add(user);
+			System.out.println("userName: " + user.getUserName());
+			System.out.println("phoneNumber: " + user.getPhoneNumber());
 			System.out.println("SignUp Successfully...!!!");
 			return user;
 		}
@@ -108,9 +110,9 @@ public class ChattingApp {
 		System.out.print("Enter Password: ");
 		String password = server.getString();
 
+		// User Object
 		User user = new User(main.getId(), userName, phoneNumber, password);
-
-		return main.addUserDetails(user) == null ? null : user;
+		return main.addUserDetails(user);
 	}
 
 //signIn
@@ -127,9 +129,7 @@ public class ChattingApp {
 		System.out.print("Enter password: ");
 		String password = server.getString();
 
-		User user = main.isExistPhoneNumber(phoneNumber);
-
-		return user != null ? user : null;
+		return main.isExistPhoneNumber(phoneNumber);
 	}
 
 //subMenu
@@ -145,8 +145,10 @@ public class ChattingApp {
 
 		} else {
 			System.out.println("Sub Menu Exit...");
+			mainMenu();
 			return;
 		}
+		
 	}
 
 //mainMenu

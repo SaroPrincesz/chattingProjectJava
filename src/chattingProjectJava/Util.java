@@ -1,29 +1,42 @@
 package chattingProjectJava;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Util {
-	
-	
-	Scanner scanner = new Scanner(System.in);
-	
+
 //Singleton Object
 	private static Util util;
 
-//Get Object\
-	public static Util getObject() {
+	Scanner scanner = new Scanner(System.in);
+	private List<Contact> contactList = new ArrayList<Contact>();
+	private List<Message> userMessages = new ArrayList<Message>();
+
+//Get Object
+	public static Util getUtilObject() {
 		if (util == null) {
 			util = new Util();
 		}
 		return util;
 	}
-	
+
+//Get User Contact List
+	public List<Contact> getContactList() {
+		return contactList;
+	}
+
+//Get User Message List
+	public List<Message> getUserMessages() {
+		return userMessages;
+	}
+
 //Get Byte Value
 	public byte getByte() {
-		while(true) {
-			if(scanner.hasNextByte()) {
+		while (true) {
+			if (scanner.hasNextByte()) {
 				return scanner.nextByte();
-			}else {
+			} else {
 				scanner.nextLine();
 			}
 		}

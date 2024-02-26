@@ -8,14 +8,12 @@ public class Message {
 	private int senderId;
 	private int receiveId;
 	private Date date;
-//	private int receivedUserId;
-//	private int receivedGroupId;
 
 	public int getMessageId() {
 		return messageId;
 	}
 
-	public String getMessageContent() {
+	public String getMessageContent() { 
 		return messageContent;
 	}
 

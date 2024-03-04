@@ -7,7 +7,14 @@ public class Message {
 	private String messageContent;
 	private int senderId;
 	private int receiveId;
-	private Date date;
+	
+//Constructor
+	public Message(int messageId, String messageContent, int senderId, int receiveId) {
+		this.messageId = messageId;
+		this.messageContent = messageContent;
+		this.senderId = senderId;
+		this.receiveId = receiveId;
+	}
 
 	public int getMessageId() {
 		return messageId;
@@ -23,10 +30,6 @@ public class Message {
 
 	public int getReceiveId() {
 		return receiveId;
-	}
-
-	public Date getDate() {
-		return date;
 	}
 
 }

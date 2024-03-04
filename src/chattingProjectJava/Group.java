@@ -4,15 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Group {
-	private int groupId;
+	public int groupId;
 	private String groupName;
-	private List<Integer> groupReceiverId;
+	private List<Integer> groupReceiversId;
 
 	public Group(int groupId, String groupName) {
 		this.groupId = groupId;
 		this.groupName = groupName;
-		groupReceiverId = new ArrayList<Integer>();
+		groupReceiversId = new ArrayList<Integer>();
 	}
 
+	public String getGroupName() {
+		return groupName;
+	}
+	
+	public List<Integer> getGroupReceiversId(){
+		return groupReceiversId;
+	}
 	
 }

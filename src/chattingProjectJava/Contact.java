@@ -2,9 +2,10 @@ package chattingProjectJava;
 
 public class Contact extends User {
 
+	public int contactUserId;
+	
 	Util server = Util.getUtilObject();
 	ChattingApp main = ChattingApp.getInstance();
-	public int contactUserId;
 
 //Default Constructor
 	public Contact() {

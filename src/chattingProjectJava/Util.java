@@ -12,6 +12,7 @@ public class Util {
 	Scanner scanner = new Scanner(System.in);
 	private List<Contact> contactList = new ArrayList<Contact>();
 	private List<Message> userMessages = new ArrayList<Message>();
+	private List<Group> usersGroup = new ArrayList<Group>();
 
 //Get Object
 	public static Util getUtilObject() {
@@ -29,6 +30,11 @@ public class Util {
 //Get User Message List
 	public List<Message> getUserMessages() {
 		return userMessages;
+	}
+	
+//Get User group List
+	public List<Group> getUsersGroup(){
+		return usersGroup;
 	}
 
 //Get Byte Value

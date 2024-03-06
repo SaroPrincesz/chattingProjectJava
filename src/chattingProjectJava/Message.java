@@ -3,6 +3,7 @@ package chattingProjectJava;
 import java.util.Date;
 
 public class Message {
+	
 	private int messageId;
 	private String messageContent;
 	private int senderId;

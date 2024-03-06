@@ -5,10 +5,11 @@ import java.util.List;
 
 public class ChattingApp {
 
-	static int messageId = 1000;
-	
+	static int messageId = 2000;
+	static int groupId = 1000;
+
 //Chatting App User's List
-	List<User> chattingAppUsers = new ArrayList<User>();
+	public List<User> chattingAppUsers = new ArrayList<User>();
 
 //Object
 	Util server = Util.getUtilObject();
@@ -20,13 +21,19 @@ public class ChattingApp {
 		return main;
 	}
 
+//Get Id
+	public int getId() {
+		return chattingAppUsers.size() + 1;
+	}
+
+//Get Message Id
 	public int getMessageId() {
 		return ++messageId;
 	}
 
-//Get Id
-	public int getId() {
-		return chattingAppUsers.size() + 1;
+//Get Group Id
+	public int getGroupId() {
+		return ++groupId;
 	}
 
 // Check Name
@@ -68,6 +75,195 @@ public class ChattingApp {
 		return null;
 	}
 
+//Group Menu
+	public void groupMenu(User user) {
+		System.out.println("1. Create Group \n2. View Group \n3. Chat \n4. Exit");
+		System.out.print("Enter your choice: ");
+		byte userInput = server.getByte();
+
+		if (userInput == 1) {
+			user.createNewGroup(user);
+		} else if (userInput == 2) {
+			user.viewGroup(user);
+		} else if (userInput == 3) {
+			Group group = chooseTheGroup(user);
+			if (group == null) {
+				user.viewGroup(user);
+			} else {
+				groupMessageMenu(group, user);
+			}
+		} else {
+			System.out.println("Group Menu Exit...");
+			subMenu(user);
+			return;
+		}
+	}
+
+//group Message Menu
+	public void groupMessageMenu(Group group, User user) {
+		System.out.println("1. Message \n2. View Old Chat \n3. Exit");
+		System.out.print("Enter your Choice: ");
+		byte userInput = server.getByte();
+
+		if (userInput == 1) {
+			System.out.println("If you want to close that chat, Enter 'Mmm' ");
+			message(user, group);
+			groupMessageMenu(group, user);
+		} else if (userInput == 2) {
+			loadingGroupMessages(group, user);
+		} else {
+			System.out.println("Group Message Menu Exit...");
+			groupMenu(user);
+			return;
+		}
+	}
+
+// Get the phonenumber
+	public long getUser(int id) {
+		if (chattingAppUsers == null || chattingAppUsers.size() == 0) {
+			return 0;
+		} else {
+			for (int i = 0; i < chattingAppUsers.size(); i++) {
+				if (chattingAppUsers.get(i).id == id) {
+					return chattingAppUsers.get(i).getPhoneNumber();
+				}
+			}
+		}
+		return 0;
+	}
+
+//View Group old Chats
+	public void viewGroupOldChat(Group group, User user, List<Message> loadMessages) {
+		for (int i = 0; i < loadMessages.size(); i++) {
+			if (loadMessages.get(i).getSenderId() == user.id) {
+				System.out.println("\t\t\t\t" + loadMessages.get(i).getMessageContent());
+			} else {
+				long phoneNumber = getUser(loadMessages.get(i).getSenderId());
+				Contact contact = user.isExistContact(user.id, phoneNumber);
+				if (contact != null) {
+					System.out.println(contact.getUserName() + " : " + loadMessages.get(i).getMessageContent());
+				} else {
+					System.out.println(phoneNumber + " : " + loadMessages.get(i).getMessageContent());
+				}
+			}
+		}
+		groupMessageMenu(group, user);
+	}
+
+//Loading Group Messages
+	public void loadingGroupMessages(Group group, User user) {
+		List<Message> loadMessages = new ArrayList<Message>();
+		if (server.getUserMessages() == null || server.getUserMessages().size() == 0) {
+			System.out.println("No Messages...");
+		} else {
+			for (int i = 0; i < server.getUserMessages().size(); i++) {
+				if (server.getUserMessages().get(i).getReceiveId() == group.groupId) {
+					loadMessages.add(server.getUserMessages().get(i));
+				}
+			}
+			if (loadMessages.size() > 0) {
+				viewGroupOldChat(group, user, loadMessages);
+			} else {
+				System.out.println("No Messages...");
+				groupMessageMenu(group, user);
+				return;
+			}
+		}
+	}
+
+// View Old Individual Chats
+	public void viewOldChat(Contact contact, User user) {
+		int count = 0;
+		if (server.getUserMessages() == null || server.getUserMessages().size() == 0) {
+			System.out.println("No Messages...");
+		} else {
+			for (int i = 0; i < server.getUserMessages().size(); i++) {
+				if (server.getUserMessages().get(i).getSenderId() == user.id
+						&& server.getUserMessages().get(i).getReceiveId() == contact.contactUserId) {
+					System.out.println("\t\t" + server.getUserMessages().get(i).getMessageContent());
+					count++;
+				} else if (server.getUserMessages().get(i).getSenderId() == contact.contactUserId
+						&& server.getUserMessages().get(i).getReceiveId() == user.id) {
+					System.out.println(server.getUserMessages().get(i).getMessageContent());
+					count++;
+
+				}
+			}
+			System.out.println();
+		}
+		if (count == 0) {
+			System.out.println("No Messages...");
+		}
+		messageMenu(contact, user);
+	}
+
+//User Enter Message
+	public void message(User user, Contact contact) {
+		System.out.print("Message: ");
+		String msg = server.getString();
+		if (msg.equals("Mmm")) {
+			return;
+		} else {
+			server.getUserMessages().add(new Message(getMessageId(), msg, user.id, contact.contactUserId));
+			message(user, contact);
+		}
+	}
+
+//Method Overloading
+	public void message(User user, Group group) {
+		System.out.print("Message: ");
+		String msg = server.getString();
+		if (msg.equals("Mmm")) {
+			return;
+		} else {
+			server.getUserMessages().add(new Message(getMessageId(), msg, user.id, group.groupId));
+			message(user, group);
+		}
+	}
+
+// Message Menu
+	public void messageMenu(Contact contact, User user) {
+		System.out.println("1. Message \n2. View Old Chat \n3. Exit");
+		byte userInput = server.getByte();
+		if (userInput == 1) {
+			System.out.println("If you want to close that chat, Enter 'Mmm' ");
+			message(user, contact);
+			messageMenu(contact, user);
+		} else if (userInput == 2) {
+			viewOldChat(contact, user);
+		} else {
+			System.out.println("Message Menu Exit...");
+			subMenu(user);
+			return;
+		}
+
+	}
+
+//Choose the Contact from the User
+	public Group chooseTheGroup(User user) {
+		System.out.print("Enter the Group Name: ");
+		String groupName = server.getString();
+		if (server.getUsersGroup() == null || server.getUsersGroup().size() == 0) {
+			System.out.println("No Groups...");
+			return null;
+		} else {
+			for (int i = 0; i < server.getUsersGroup().size(); i++) {
+				if (server.getUsersGroup().get(i).getGroupName().equals(groupName)) {
+					if (server.getUsersGroup().get(i).userId == user.id) {
+						return server.getUsersGroup().get(i);
+					} else {
+						for (int j = 0; j < server.getUsersGroup().get(i).getGroupReceiversId().size(); j++) {
+							if (server.getUsersGroup().get(i).getGroupReceiversId().get(j) == user.id) {
+								return server.getUsersGroup().get(i);
+							}
+						}
+					}
+				}
+			}
+			return null;
+		}
+	}
+
 //Choose the Contact from the User
 	public Contact chooseTheContact(User user) {
 		System.out.print("Enter the Contact Name: ");
@@ -86,38 +282,29 @@ public class ChattingApp {
 		}
 	}
 
-//View Old Individual Chats
-	public void viewOldChat(Contact contact, User user) {
-		int count = 0;
-		if (server.getUserMessages() == null || server.getUserMessages().size() == 0) {
-			System.out.println("No Messages...");
-		} else {
-			for (int i = 0; i < server.getUserMessages().size(); i++) {
-				if (server.getUserMessages().get(i).getSenderId() == user.id
-						&& server.getUserMessages().get(i).getReceiveId() == contact.contactUserId) {
-					System.out.println("\t\t" + server.getUserMessages().get(i).getMessageContent());
-					count++;
-				} else if (server.getUserMessages().get(i).getSenderId() == contact.contactUserId
-						&& server.getUserMessages().get(i).getReceiveId() == user.id) {
-					System.out.println(server.getUserMessages().get(i).getMessageContent());
-					count++;
-				}
-			}
-			System.out.println();
-		}
-		if (count == 0) {
-			System.out.println("No Messages...");
-		}
-		messageMenu(contact, user);
-	}
+//subMenu
+	public void subMenu(User user) {
+		System.out.println("1. Create Chat Contact \n2. View Chat Contact \n3. Chat \n4. Group \n5.Exit");
+		System.out.print("Enter you Choice: ");
+		byte userInput = server.getByte();
 
-//Message 
-	public void message(User user) {
-		Contact contact = chooseTheContact(user);
-		if (contact == null) {
+		if (userInput == 1) {
+			user.createNewContact(user);
+		} else if (userInput == 2) {
 			user.viewContact(user);
+		} else if (userInput == 3) {
+			Contact contact = chooseTheContact(user);
+			if (contact == null) {
+				user.viewContact(user);
+			} else {
+				messageMenu(contact, user);
+			}
+		} else if (userInput == 4) {
+			groupMenu(user);
 		} else {
-			messageMenu(contact, user);
+			System.out.println("Sub Menu Exit...");
+			mainMenu();
+			return;
 		}
 	}
 
@@ -161,8 +348,8 @@ public class ChattingApp {
 
 		// User Object
 		User user = new User(main.getId(), userName, phoneNumber, password);
-		
-		//Add User Details
+
+		// Add User Details
 		if (isExistPhoneNumber(phoneNumber) == null) {
 			chattingAppUsers.add(user);
 			System.out.println("SignUp Successfully...!!!");
@@ -186,50 +373,6 @@ public class ChattingApp {
 		String password = server.getString();
 
 		return main.isExistPhoneNumber(phoneNumber);
-	}
-
-// Message Menu
-	public void messageMenu(Contact contact, User user) {
-		System.out.println("1. Message \n2. View Old Chat \n3. Exit");
-		byte userInput = server.getByte();
-		if (userInput == 1) {
-			System.out.println("If you want to close that chat, Enter 'Mmm' ");
-			while (true) {
-				String msg = server.getString();
-				if (msg.equals("Mmm")) {
-					break;
-				} else {
-					server.getUserMessages().add(new Message(getMessageId(), msg, user.id, contact.contactUserId));
-				}
-			}
-			messageMenu(contact, user);
-		} else if (userInput == 2) {
-			viewOldChat(contact, user);
-		} else {
-			System.out.println("Message Menu Exit...");
-			subMenu(user);
-			return;
-		}
-
-	}
-
-//subMenu
-	public void subMenu(User user) {
-		System.out.println("1. Create Chat Contact \n2. View Chat Contact \n3. Chat \n4. Exit");
-		System.out.print("Enter you Choice: ");
-		byte userInput = server.getByte();
-
-		if (userInput == 1) {
-			user.createNewContact(user);
-		} else if (userInput == 2) {
-			user.viewContact(user);
-		} else if (userInput == 3) {
-			message(user);
-		} else {
-			System.out.println("Sub Menu Exit...");
-			mainMenu();
-			return;
-		}
 	}
 
 //mainMenu
